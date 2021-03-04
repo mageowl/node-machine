@@ -1,0 +1,77 @@
+.container {
+	min-width: 150px;
+	padding: 10px;
+	border-radius: 10px;
+	background-color: #4f76e4;
+	border: 5px solid #3a59af;
+	cursor: grab;
+	user-select: none;
+	position: absolute;
+}
+
+.container.grab {
+	cursor: grabbing;
+	box-shadow: -2px 6px #192850;
+	margin-left: 2px;
+	margin-top: -6px;
+	z-index: 100;
+}
+
+.title {
+	margin-bottom: 8px;
+	display: block;
+	color: #111b36;
+}
+
+.io {
+	margin-bottom: 5px;
+}
+
+.io .tag {
+	font-size: 0.8em;
+	color: #1f3266;
+	text-transform: uppercase;
+	height: 21px;
+	line-height: 21px;
+}
+
+.io input.tag {
+	border-radius: 100px;
+	border: 2px solid rgb(219, 219, 219);
+	outline: none;
+	text-transform: none;
+}
+
+.container.grab .io input.tag {
+	cursor: grabbing !important;
+}
+
+.io input.tag::placeholder {
+	font-size: 0.8em;
+	color: rgb(184, 184, 184);
+	text-transform: uppercase;
+}
+
+.io.out nm-pin {
+	float: right;
+	margin-right: -25px;
+}
+
+.io.in nm-pin {
+	float: left;
+	margin-left: -25px;
+}
+
+.io.in .tag {
+	text-align: right;
+	display: block;
+}
+
+.io.in.flow {
+	position: relative;
+	top: -30px;
+}
+
+.io.out.flow {
+	height: 21px;
+}

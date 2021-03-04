@@ -1,0 +1,14 @@
+div {
+	width: 15px;
+	height: 15px;
+	line-height: 15px;
+	border: white solid 3px;
+	border-radius: 15px;
+	cursor: pointer;
+}
+
+div:hover {
+	border-width: 5px;
+	width: 11px;
+	height: 11px;
+}
