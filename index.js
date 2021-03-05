@@ -7,8 +7,8 @@ const nodes = {
 			{ name: "Number", type: "number" }
 		],
 		outputs: [{ name: "Sum", type: "number" }],
-		run(inputs) {
-			return [inputs[0] + inputs[1]];
+		run([a, b]) {
+			return [a + b];
 		}
 	},
 	sub: {
@@ -19,8 +19,8 @@ const nodes = {
 			{ name: "Number", type: "number" }
 		],
 		outputs: [{ name: "Difference", type: "number" }],
-		run(inputs) {
-			return [inputs[0] - inputs[1]];
+		run([a, b]) {
+			return [a - b];
 		}
 	},
 	mul: {
@@ -31,8 +31,8 @@ const nodes = {
 			{ name: "Number", type: "number" }
 		],
 		outputs: [{ name: "Product", type: "number" }],
-		run(inputs) {
-			return [inputs[0] * inputs[1]];
+		run([a, b]) {
+			return [a * b];
 		}
 	},
 	div: {
@@ -43,8 +43,8 @@ const nodes = {
 			{ name: "Number", type: "number" }
 		],
 		outputs: [{ name: "Quotient", type: "number" }],
-		run(inputs) {
-			return [inputs[0] / inputs[1]];
+		run([a, b]) {
+			return [a / b];
 		}
 	},
 	join: {
@@ -55,8 +55,17 @@ const nodes = {
 			{ name: "B", type: "any" }
 		],
 		outputs: [{ name: "Merge", type: "string" }],
-		run(inputs) {
-			return ["" + inputs[0] + inputs[1]];
+		run([a, b]) {
+			return ["" + a + b];
+		}
+	},
+	length: {
+		title: "Length",
+		category: "string",
+		inputs: [{ name: "String", type: "string" }],
+		outputs: [{ name: "Length", type: "number" }],
+		run([string]) {
+			return [string.length];
 		}
 	},
 	print: {
@@ -65,8 +74,8 @@ const nodes = {
 		inputs: [{ name: "Text", type: "any" }],
 		outputs: [{ type: "flow" }],
 		flow: true,
-		run(inputs) {
-			console.log(inputs[0]);
+		run([text]) {
+			console.log(text);
 		}
 	},
 	alert: {
@@ -75,8 +84,8 @@ const nodes = {
 		inputs: [{ name: "Text", type: "string" }],
 		outputs: [{ type: "flow" }],
 		flow: true,
-		run(inputs) {
-			alert(inputs[0]);
+		run([text]) {
+			alert(text);
 		}
 	},
 	equals: {
@@ -87,8 +96,8 @@ const nodes = {
 			{ name: "B", type: "any" }
 		],
 		outputs: [{ name: "Equal", type: "boolean" }],
-		run(inputs) {
-			return [inputs[0] === inputs[1]];
+		run([a, b]) {
+			return [a === b];
 		}
 	},
 	lessThan: {
@@ -99,8 +108,8 @@ const nodes = {
 			{ name: "B", type: "number" }
 		],
 		outputs: [{ name: "Lesser", type: "boolean" }],
-		run(inputs) {
-			return [inputs[0] > inputs[1]];
+		run([a, b]) {
+			return [a < b];
 		}
 	},
 	greaterThan: {
@@ -111,8 +120,8 @@ const nodes = {
 			{ name: "B", type: "number" }
 		],
 		outputs: [{ name: "Greater", type: "boolean" }],
-		run(inputs) {
-			return [inputs[0] < inputs[1]];
+		run([a, b]) {
+			return [a > b];
 		}
 	},
 	if: {
@@ -124,8 +133,8 @@ const nodes = {
 			{ name: "Else", type: "flow" }
 		],
 		flow: true,
-		run(inputs) {
-			return [inputs[0], !inputs[0]];
+		run([condition]) {
+			return [condition, !condition];
 		}
 	},
 	prompt: {
@@ -134,8 +143,8 @@ const nodes = {
 		inputs: [{ name: "Prompt", type: "string" }],
 		outputs: [{ name: "User Input", type: "string" }, { type: "flow" }],
 		flow: true,
-		run(inputs) {
-			return [prompt(inputs[0])];
+		run([prompt]) {
+			return [window.prompt(prompt)];
 		}
 	},
 	null: {
@@ -153,7 +162,55 @@ const nodes = {
 		outputs: [
 			{ name: "true", type: "boolean" },
 			{ name: "false", type: "boolean" }
-		]
+		],
+		run() {
+			return [true, false];
+		}
+	},
+	not: {
+		title: "NOT Gate",
+		category: "boolean",
+		inputs: [{ name: "Boolean", type: "boolean" }],
+		outputs: [{ name: "NOT", type: "boolean" }],
+		run([bool]) {
+			return [!bool];
+		}
+	},
+	and: {
+		title: "AND Gate",
+		category: "boolean",
+		inputs: [
+			{ name: "A", type: "boolean" },
+			{ name: "B", type: "boolean" }
+		],
+		outputs: [{ name: "AND", type: "boolean" }],
+		run([a, b]) {
+			return [a && b];
+		}
+	},
+	or: {
+		title: "OR Gate",
+		category: "boolean",
+		inputs: [
+			{ name: "A", type: "boolean" },
+			{ name: "B", type: "boolean" }
+		],
+		outputs: [{ name: "OR", type: "boolean" }],
+		run([a, b]) {
+			return [a || b];
+		}
+	},
+	xor: {
+		title: "XOR Gate",
+		category: "boolean",
+		inputs: [
+			{ name: "A", type: "boolean" },
+			{ name: "B", type: "boolean" }
+		],
+		outputs: [{ name: "XOR", type: "boolean" }],
+		run([a, b]) {
+			return [(a || b) && !(a && b)];
+		}
 	},
 	onstart: {
 		title: "On Start",
