@@ -42,9 +42,12 @@ const nodes = {
 			{ name: "Number", type: "number" },
 			{ name: "Number", type: "number" }
 		],
-		outputs: [{ name: "Quotient", type: "number" }],
+		outputs: [
+			{ name: "Quotient", type: "number" },
+			{ name: "Remainder", type: "number" }
+		],
 		run([a, b]) {
-			return [a / b];
+			return [Math.floor(a / b), a % b];
 		}
 	},
 	join: {
@@ -354,6 +357,10 @@ const nodeMachine = {
 			this.container.addEventListener("contextmenu", this.ctxMenu);
 		}
 
+		connectedCallback() {
+			this.parentElement.renderList.push(this);
+		}
+
 		mouseDown = (e) => {
 			if (e.button === 0) {
 				this.container.classList.add("grab");
@@ -391,6 +398,11 @@ const nodeMachine = {
 								});
 							});
 
+						this.parentElement.renderList.splice(
+							this.parentElement.renderList.indexOf(this),
+							1
+						);
+
 						this.remove();
 						document.removeEventListener("mousemove", this.mouseMove);
 					}
@@ -405,6 +417,15 @@ const nodeMachine = {
 			this.parentElement.appendChild(menu);
 			this.parentElement.menu = menu;
 		};
+
+		render() {
+			return {
+				type: "node",
+				node: this.type,
+				value: this.shadowRoot.querySelector("input")?.value,
+				position: { x: this.style.left, y: this.style.top }
+			};
+		}
 	},
 
 	PinElement: class PinElement extends HTMLElement {
@@ -551,10 +572,17 @@ const nodeMachine = {
 			if (x2) {
 				this.ctx.beginPath();
 				this.ctx.moveTo(x1, y1);
-				let diff = x1 - x2;
-				let cx = x1 - diff / 2;
+				const diff = x1 - x2;
+				const cx = x1 - diff / 2;
 				this.ctx.bezierCurveTo(cx + 30, y1, cx - 30, y2, x2, y2);
 				this.ctx.stroke();
+
+				return {
+					type: "wire",
+					active: this.active,
+					p1: { x: x1, y: y1 },
+					p2: { x: x2, y: y2 }
+				};
 			}
 		}
 	},
@@ -733,9 +761,15 @@ const nodeMachine = {
 			process(node);
 			processed.forEach((node) => (node.value = null));
 		}
+
+		getURL() {
+			const data = this.renderList.map((o) => o.render());
+			return JSON.stringify(data);
+		}
 	},
 
 	init(types, nodes) {
+		// Types
 		this.types = {
 			any: {
 				color: "lightgray",
@@ -771,11 +805,60 @@ const nodeMachine = {
 			)
 		};
 
+		// Custom Elements
 		customElements.define("nm-pin", nodeMachine.PinElement);
 		customElements.define("nm-node", nodeMachine.NodeElement);
 		customElements.define("nm-ctx-menu", nodeMachine.CTXMenuElement);
 		customElements.define("nm-canvas", nodeMachine.CanvasElement, {
 			extends: "div"
+		});
+
+		// Load
+		const json = new URLSearchParams(location.search).get("d");
+
+		if (json) {
+			const data = JSON.parse(json);
+
+			data
+				.filter((o) => o.type === "node")
+				.forEach((data) => {
+					const el = new this.NodeElement(data.node);
+					el.style = `position: absolute;left:${data.position.x};top:${data.position.y};`;
+					if (data.value)
+						el.shadowRoot.querySelector("input").value = data.value;
+					document.querySelector("div[is=nm-canvas]").appendChild(el);
+				});
+
+			setTimeout(() => {
+				data
+					.filter((o) => o.type === "wire")
+					.forEach((data) => {
+						const p1 = document
+							.elementFromPoint(data.p1.x, data.p1.y)
+							.shadowRoot.elementFromPoint(data.p1.x, data.p1.y);
+						const p2 = document
+							.elementFromPoint(data.p2.x, data.p2.y)
+							.shadowRoot.elementFromPoint(data.p2.x, data.p2.y);
+						const wire = new this.Wire(
+							document.querySelector("div[is=nm-canvas]"),
+							p1,
+							p2
+						);
+
+						if (p2.type === "any")
+							p2.el.style.backgroundColor = p1.el.style.backgroundColor;
+					});
+			}, 100);
+		}
+
+		// Save
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "s" && e.metaKey) {
+				e.preventDefault();
+				location.href = `${
+					location.href.split("?")[0]
+				}?d=${document.querySelector("div[is=nm-canvas]").getURL()}`;
+			}
 		});
 	}
 };
