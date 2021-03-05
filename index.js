@@ -10,6 +10,39 @@ const nodes = {
 			return [inputs[0] + inputs[1]];
 		}
 	},
+	sub: {
+		title: "Subtract",
+		inputs: [
+			{ name: "Number", type: "number" },
+			{ name: "Number", type: "number" }
+		],
+		outputs: [{ name: "Difference", type: "number" }],
+		run(inputs) {
+			return [inputs[0] - inputs[1]];
+		}
+	},
+	mul: {
+		title: "Multiply",
+		inputs: [
+			{ name: "Number", type: "number" },
+			{ name: "Number", type: "number" }
+		],
+		outputs: [{ name: "Product", type: "number" }],
+		run(inputs) {
+			return [inputs[0] * inputs[1]];
+		}
+	},
+	add: {
+		title: "Divide",
+		inputs: [
+			{ name: "Number", type: "number" },
+			{ name: "Number", type: "number" }
+		],
+		outputs: [{ name: "Quotient", type: "number" }],
+		run(inputs) {
+			return [inputs[0] / inputs[1]];
+		}
+	},
 	join: {
 		title: "Join",
 		inputs: [
