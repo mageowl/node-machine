@@ -1,6 +1,7 @@
 const nodes = {
 	add: {
 		title: "Add",
+		category: "number",
 		inputs: [
 			{ name: "Number", type: "number" },
 			{ name: "Number", type: "number" }
@@ -12,6 +13,7 @@ const nodes = {
 	},
 	sub: {
 		title: "Subtract",
+		category: "number",
 		inputs: [
 			{ name: "Number", type: "number" },
 			{ name: "Number", type: "number" }
@@ -23,6 +25,7 @@ const nodes = {
 	},
 	mul: {
 		title: "Multiply",
+		category: "number",
 		inputs: [
 			{ name: "Number", type: "number" },
 			{ name: "Number", type: "number" }
@@ -32,8 +35,9 @@ const nodes = {
 			return [inputs[0] * inputs[1]];
 		}
 	},
-	add: {
+	div: {
 		title: "Divide",
+		category: "number",
 		inputs: [
 			{ name: "Number", type: "number" },
 			{ name: "Number", type: "number" }
@@ -45,6 +49,7 @@ const nodes = {
 	},
 	join: {
 		title: "Join",
+		category: "string",
 		inputs: [
 			{ name: "A", type: "any" },
 			{ name: "B", type: "any" }
@@ -56,6 +61,7 @@ const nodes = {
 	},
 	print: {
 		title: "Print",
+		category: "output",
 		inputs: [{ name: "Text", type: "any" }],
 		outputs: [{ type: "flow" }],
 		flow: true,
@@ -65,6 +71,7 @@ const nodes = {
 	},
 	alert: {
 		title: "Alert",
+		category: "output",
 		inputs: [{ name: "Text", type: "any" }],
 		outputs: [{ type: "flow" }],
 		flow: true,
@@ -74,6 +81,7 @@ const nodes = {
 	},
 	is: {
 		title: "Equals",
+		category: "bool",
 		inputs: [
 			{ name: "A", type: "any" },
 			{ name: "B", type: "any" }
@@ -85,6 +93,7 @@ const nodes = {
 	},
 	if: {
 		title: "If",
+		category: "control",
 		inputs: [{ name: "Condition", type: "bool" }],
 		outputs: [
 			{ name: "Then", type: "flow" },
@@ -97,6 +106,7 @@ const nodes = {
 	},
 	prompt: {
 		title: "Get Input",
+		category: "string",
 		inputs: [{ name: "Prompt", type: "string" }],
 		outputs: [{ name: "User Input", type: "string" }, { type: "flow" }],
 		flow: true,
@@ -115,6 +125,7 @@ const nodes = {
 	bool: {
 		showTitle: false,
 		title: "Boolean",
+		category: "bool",
 		outputs: [
 			{ name: "true", type: "bool" },
 			{ name: "false", type: "bool" }
@@ -122,6 +133,7 @@ const nodes = {
 	},
 	onstart: {
 		title: "On Start",
+		category: "control",
 		outputs: [{ type: "flow" }]
 	}
 };
@@ -129,27 +141,27 @@ const nodes = {
 const types = {
 	number: {
 		color: "#ffc300",
-		processer(value) {
+		processor(value) {
 			return parseInt(value.toString());
 		}
 	},
 	string: {
 		color: "#43ba43",
-		processer(value) {
+		processor(value) {
 			return value.toString();
 		}
 	},
 	bool: {
 		color: "#FF5572",
 		createNode: false,
-		processer(value) {
+		processor(value) {
 			return Boolean(value);
 		}
 	},
 	null: {
 		color: "black",
 		createNode: false,
-		processer() {
+		processor() {
 			return null;
 		}
 	}
@@ -461,13 +473,38 @@ const nodeMachine = {
 			const container = document.createElement("div");
 			container.classList.add("container");
 
-			menu.forEach((node) => {
-				const el = document.createElement("div");
-				el.innerText = node.title;
-				el.classList.add("menu-item");
-				el.addEventListener("click", node.callback);
+			let submenus = {};
 
-				container.appendChild(el);
+			menu.forEach((node) => {
+				if (node.submenu) {
+					let menuContainer;
+					if (!Object.keys(submenus).includes(node.submenu)) {
+						const menuEl = document.createElement("div");
+						menuEl.innerText = node.submenu;
+						menuEl.classList.add("menu-item", "submenu");
+
+						menuContainer = document.createElement("div");
+						menuContainer.classList.add("container");
+						menuEl.appendChild(menuContainer);
+
+						container.appendChild(menuEl);
+						submenus[node.submenu] = menuContainer;
+					} else menuContainer = submenus[node.submenu];
+
+					const el = document.createElement("div");
+					el.innerText = node.title;
+					el.classList.add("menu-item");
+					el.addEventListener("click", node.callback);
+
+					menuContainer.appendChild(el);
+				} else {
+					const el = document.createElement("div");
+					el.innerText = node.title;
+					el.classList.add("menu-item");
+					el.addEventListener("click", node.callback);
+
+					container.appendChild(el);
+				}
 			});
 
 			const style = document.createElement("link");
@@ -513,17 +550,31 @@ const nodeMachine = {
 			if (this.menu) this.menu.remove();
 			const menu = [];
 			const canvas = this;
-			Object.entries(nodeMachine.nodes).forEach(([node, { title }]) => {
-				menu.push({
-					title,
-					callback() {
-						const el = new nodeMachine.NodeElement(node);
-						el.style.left = e.clientX;
-						el.style.top = e.clientY;
-						canvas.appendChild(el);
-					}
-				});
-			});
+			Object.entries(nodeMachine.nodes).forEach(
+				([node, { title, category }]) => {
+					if (category == null)
+						menu.push({
+							title,
+							callback() {
+								const el = new nodeMachine.NodeElement(node);
+								el.style.left = e.clientX;
+								el.style.top = e.clientY;
+								canvas.appendChild(el);
+							}
+						});
+					else
+						menu.push({
+							title,
+							submenu: category[0].toUpperCase() + category.slice(1),
+							callback() {
+								const el = new nodeMachine.NodeElement(node);
+								el.style.left = e.clientX;
+								el.style.top = e.clientY;
+								canvas.appendChild(el);
+							}
+						});
+				}
+			);
 			this.menu = new nodeMachine.CTXMenuElement(menu);
 			this.menu.style = `position: absolute; left: ${e.clientX}; top: ${e.clientY}`;
 			this.appendChild(this.menu);
@@ -557,7 +608,7 @@ const nodeMachine = {
 								inputs.push((process(output.node) ?? [])[outputIndex]);
 							});
 						typeData.inputs.forEach(({ type }, i) => {
-							inputs[i] = nodeMachine.types[type].processer(inputs[i]);
+							inputs[i] = nodeMachine.types[type].processor(inputs[i]);
 						});
 					}
 
@@ -591,7 +642,7 @@ const nodeMachine = {
 		this.types = {
 			any: {
 				color: "lightgray",
-				processer(value) {
+				processor(value) {
 					return value;
 				}
 			},
@@ -607,10 +658,11 @@ const nodeMachine = {
 							? {
 									showTitle: false,
 									title: name[0].toUpperCase() + name.slice(1),
+									category: name,
 									outputs: [{ input: true, type: name, name }],
 									run(_inputs, node) {
 										return [
-											data.processer(
+											data.processor(
 												node.shadowRoot.querySelector("input").value
 											)
 										];

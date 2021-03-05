@@ -16,3 +16,31 @@
 .container .menu-item:hover {
 	background-color: #b1b1b1;
 }
+
+.container .submenu::after {
+	content: " ";
+	float: right;
+
+	width: 0;
+	height: 0;
+	margin-top: 2px;
+	border-top: 8px solid transparent;
+	border-bottom: 8px solid transparent;
+	border-left: 8px solid #b1b1b1;
+
+	border-radius: 10px;
+}
+
+.container .submenu .container {
+	position: absolute;
+	margin-top: -22px;
+	left: 100px;
+}
+
+.container .submenu .container {
+	display: none;
+}
+
+.container .submenu:hover .container {
+	display: block;
+}
