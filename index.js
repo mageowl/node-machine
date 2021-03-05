@@ -72,29 +72,53 @@ const nodes = {
 	alert: {
 		title: "Alert",
 		category: "output",
-		inputs: [{ name: "Text", type: "any" }],
+		inputs: [{ name: "Text", type: "string" }],
 		outputs: [{ type: "flow" }],
 		flow: true,
 		run(inputs) {
 			alert(inputs[0]);
 		}
 	},
-	is: {
+	equals: {
 		title: "Equals",
-		category: "bool",
+		category: "boolean",
 		inputs: [
 			{ name: "A", type: "any" },
 			{ name: "B", type: "any" }
 		],
-		outputs: [{ name: "Equal", type: "bool" }],
+		outputs: [{ name: "Equal", type: "boolean" }],
 		run(inputs) {
 			return [inputs[0] === inputs[1]];
 		}
 	},
+	lessThan: {
+		title: "Less Than",
+		category: "boolean",
+		inputs: [
+			{ name: "A", type: "number" },
+			{ name: "B", type: "number" }
+		],
+		outputs: [{ name: "Lesser", type: "boolean" }],
+		run(inputs) {
+			return [inputs[0] > inputs[1]];
+		}
+	},
+	greaterThan: {
+		title: "Greater Than",
+		category: "boolean",
+		inputs: [
+			{ name: "A", type: "number" },
+			{ name: "B", type: "number" }
+		],
+		outputs: [{ name: "Greater", type: "boolean" }],
+		run(inputs) {
+			return [inputs[0] < inputs[1]];
+		}
+	},
 	if: {
 		title: "If",
-		category: "control",
-		inputs: [{ name: "Condition", type: "bool" }],
+		category: "flow",
+		inputs: [{ name: "Condition", type: "boolean" }],
 		outputs: [
 			{ name: "Then", type: "flow" },
 			{ name: "Else", type: "flow" }
@@ -122,18 +146,18 @@ const nodes = {
 			return null;
 		}
 	},
-	bool: {
+	boolean: {
 		showTitle: false,
 		title: "Boolean",
-		category: "bool",
+		category: "boolean",
 		outputs: [
-			{ name: "true", type: "bool" },
-			{ name: "false", type: "bool" }
+			{ name: "true", type: "boolean" },
+			{ name: "false", type: "boolean" }
 		]
 	},
 	onstart: {
 		title: "On Start",
-		category: "control",
+		category: "flow",
 		outputs: [{ type: "flow" }]
 	}
 };
@@ -151,7 +175,7 @@ const types = {
 			return value.toString();
 		}
 	},
-	bool: {
+	boolean: {
 		color: "#FF5572",
 		createNode: false,
 		processor(value) {
@@ -305,7 +329,8 @@ const nodeMachine = {
 							.querySelectorAll(".io.out:not(.flow) nm-pin")
 							.forEach((pin) => {
 								this.parentElement.renderList.forEach((w) => {
-									if (w.p1 === pin) w.p2.el.style.backgroundColor = "lightgray";
+									if (w.p1 === pin && w.p2.type === "any")
+										w.p2.el.style.backgroundColor = "lightgray";
 								});
 							});
 
@@ -384,7 +409,19 @@ const nodeMachine = {
 				nodeMachine.activeWire &&
 				(nodeMachine.activeWire.p1.type === "flow") === (this.type === "flow")
 			) {
+				if (this.type !== "flow")
+					this.canvas.renderList.forEach((w, i) => {
+						if (w.p2 === this) this.canvas.renderList.splice(i, 1);
+					});
+
 				nodeMachine.activeWire.p2 = this;
+
+				if (this.type === "flow")
+					this.canvas.renderList.forEach((w, i) => {
+						if (w.p1 === nodeMachine.activeWire.p1 && w.p2 !== this)
+							this.canvas.renderList.splice(i, 1);
+					});
+
 				nodeMachine.activeWire.active = false;
 				if (this.type === "any")
 					this.el.style.backgroundColor =
@@ -457,7 +494,9 @@ const nodeMachine = {
 			if (x2) {
 				this.ctx.beginPath();
 				this.ctx.moveTo(x1, y1);
-				this.ctx.lineTo(x2, y2);
+				let diff = x1 - x2;
+				let cx = x1 - diff / 2;
+				this.ctx.bezierCurveTo(cx + 30, y1, cx - 30, y2, x2, y2);
 				this.ctx.stroke();
 			}
 		}
@@ -521,6 +560,7 @@ const nodeMachine = {
 		constructor() {
 			super();
 			this.style.height = "100%";
+			this.style.fontFamily = "sans-serif";
 			this.menu = null;
 			this.addEventListener("contextmenu", this.ctxMenu);
 			window.addEventListener("resize", () =>
