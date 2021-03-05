@@ -817,7 +817,7 @@ const nodeMachine = {
 		const url = new URLSearchParams(location.search);
 
 		if (url.has("d")) {
-			const data = atob(JSON.parse(url.get("d")));
+			const data = JSON.parse(atob(url.get("d")));
 
 			data
 				.filter((o) => o.type === "node")
