@@ -453,6 +453,9 @@ const nodeMachine = {
 			this.style.height = "100%";
 			this.menu = null;
 			this.addEventListener("contextmenu", this.ctxMenu);
+			window.addEventListener("resize", () =>
+				alert("Document changed size. Press CMD+R to fix rendering.")
+			);
 			this.renderList = [];
 		}
 
