@@ -764,7 +764,7 @@ const nodeMachine = {
 
 		getURL() {
 			const data = this.renderList.map((o) => o.render());
-			return JSON.stringify(data);
+			return `${location.href.split("?")[0]}?d=${btoa(JSON.stringify(data))}`;
 		}
 	},
 
@@ -814,10 +814,10 @@ const nodeMachine = {
 		});
 
 		// Load
-		const json = new URLSearchParams(location.search).get("d");
+		const url = new URLSearchParams(location.search);
 
-		if (json) {
-			const data = JSON.parse(json);
+		if (url.has("d")) {
+			const data = atob(JSON.parse(url.get("d")));
 
 			data
 				.filter((o) => o.type === "node")
