@@ -8,12 +8,11 @@
 }
 
 .container .menu-item {
-	cursor: pointer;
 	padding: 2px;
 	border-radius: 3px;
+	cursor: pointer;
 }
 
 .container .menu-item:hover {
-	cursor: pointer;
 	background-color: #b1b1b1;
 }

@@ -214,7 +214,7 @@ const nodeMachine = {
 			}
 
 			const style = document.createElement("link");
-			style.href = "node.css";
+			style.href = "css/node.css";
 			style.rel = "stylesheet";
 
 			this.container.appendChild(ioContainer);
@@ -302,7 +302,7 @@ const nodeMachine = {
 			}
 
 			const style = document.createElement("link");
-			style.href = "pin.css";
+			style.href = "css/pin.css";
 			style.rel = "stylesheet";
 
 			this.shadowRoot.append(style, this.el);
@@ -433,11 +433,12 @@ const nodeMachine = {
 				el.innerText = node.title;
 				el.classList.add("menu-item");
 				el.addEventListener("click", node.callback);
+
 				container.appendChild(el);
 			});
 
 			const style = document.createElement("link");
-			style.href = "ctx-menu.css";
+			style.href = "css/ctx-menu.css";
 			style.rel = "stylesheet";
 
 			this.shadowRoot.append(style, container);
@@ -451,27 +452,7 @@ const nodeMachine = {
 			super();
 			this.style.height = "100%";
 			this.menu = null;
-			this.addEventListener("contextmenu", (e) => {
-				e.preventDefault();
-
-				if (this.menu) this.menu.remove();
-				const menu = [];
-				const canvas = this;
-				Object.entries(nodeMachine.nodes).forEach(([node, { title }]) => {
-					menu.push({
-						title,
-						callback() {
-							const el = new nodeMachine.NodeElement(node);
-							el.style.left = e.clientX;
-							el.style.top = e.clientY;
-							canvas.appendChild(el);
-						}
-					});
-				});
-				this.menu = new nodeMachine.CTXMenuElement(menu);
-				this.menu.style = `position: absolute; left: ${e.clientX}; top: ${e.clientY}`;
-				this.appendChild(this.menu);
-			});
+			this.addEventListener("contextmenu", this.ctxMenu);
 			this.renderList = [];
 		}
 
@@ -489,6 +470,28 @@ const nodeMachine = {
 			this.renderList.forEach((o) => o.render());
 			requestAnimationFrame(this.update.bind(this));
 		}
+
+		ctxMenu = (e) => {
+			e.preventDefault();
+
+			if (this.menu) this.menu.remove();
+			const menu = [];
+			const canvas = this;
+			Object.entries(nodeMachine.nodes).forEach(([node, { title }]) => {
+				menu.push({
+					title,
+					callback() {
+						const el = new nodeMachine.NodeElement(node);
+						el.style.left = e.clientX;
+						el.style.top = e.clientY;
+						canvas.appendChild(el);
+					}
+				});
+			});
+			this.menu = new nodeMachine.CTXMenuElement(menu);
+			this.menu.style = `position: absolute; left: ${e.clientX}; top: ${e.clientY}`;
+			this.appendChild(this.menu);
+		};
 
 		/**
 		 * Runs node.
