@@ -855,9 +855,7 @@ const nodeMachine = {
 		document.addEventListener("keydown", (e) => {
 			if (e.key === "s" && e.metaKey) {
 				e.preventDefault();
-				location.href = `${
-					location.href.split("?")[0]
-				}?d=${document.querySelector("div[is=nm-canvas]").getURL()}`;
+				location.href = document.querySelector("div[is=nm-canvas]").getURL();
 			}
 		});
 	}
