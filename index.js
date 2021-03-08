@@ -1,3 +1,6 @@
+const welcomeURL =
+	"/?t=NodeMachine&a=seattleowl&p=NodeMachine+is+a+visual+programing+language+in+your+url+bar.+To+start+press+edit+and+right+click+anywhere.+You+can+save+you+files+by+pressing+CTRL%2BS+(CMD%2BS+mac,)+then+copying+the+URL+and+sending+it+to+anybody+you+want.+A+full+tutorial+is+avalible+__TUTORIAL[here]__.";
+
 const nodes = {
 	add: {
 		title: "Add",
@@ -215,7 +218,7 @@ const nodes = {
 			return [(a || b) && !(a && b)];
 		}
 	},
-	onstart: {
+	start: {
 		title: "On Start",
 		category: "flow",
 		outputs: [{ type: "flow" }]
@@ -764,7 +767,11 @@ const nodeMachine = {
 
 		getURL() {
 			const data = this.renderList.map((o) => o.render());
-			return `${location.href.split("?")[0]}?d=${btoa(JSON.stringify(data))}`;
+			return `${location.href.split("?")[0]}?d=${btoa(
+				JSON.stringify(data)
+			)}&t=${document.querySelector("h1#title").innerText}&a=${
+				document.querySelector("span#author").innerText
+			}&p=${document.querySelector("p#desc").innerText}`;
 		}
 	},
 
@@ -815,6 +822,7 @@ const nodeMachine = {
 
 		// Load
 		const url = new URLSearchParams(location.search);
+		const canvas = document.querySelector("div[is=nm-canvas]");
 
 		if (url.has("d")) {
 			const data = JSON.parse(atob(url.get("d")));
@@ -826,7 +834,7 @@ const nodeMachine = {
 					el.style = `position: absolute;left:${data.position.x};top:${data.position.y};`;
 					if (data.value)
 						el.shadowRoot.querySelector("input").value = data.value;
-					document.querySelector("div[is=nm-canvas]").appendChild(el);
+					canvas.appendChild(el);
 				});
 
 			setTimeout(() => {
@@ -839,23 +847,97 @@ const nodeMachine = {
 						const p2 = document
 							.elementFromPoint(data.p2.x, data.p2.y)
 							.shadowRoot.elementFromPoint(data.p2.x, data.p2.y);
-						const wire = new this.Wire(
-							document.querySelector("div[is=nm-canvas]"),
-							p1,
-							p2
-						);
+						const wire = new this.Wire(canvas, p1, p2);
 
 						if (p2.type === "any")
 							p2.el.style.backgroundColor = p1.el.style.backgroundColor;
 					});
+
+				if (url.has("t")) {
+					document.querySelector("#desc-page").style.display = "block";
+					document.querySelector("#desc-page h1#title").innerText = url.get(
+						"t"
+					);
+					document.querySelector("#desc-page span#author").innerText = url.get(
+						"a"
+					);
+					if (url.get("p"))
+						document.querySelector("#desc-page p#desc").innerHTML = url
+							.get("p")
+							.replace(">", "&#62;")
+							.replace("<", "&#60;")
+							.replace(
+								"__TUTORIAL[",
+								"<a href='https://github.com/seattleowl/node-machine/wiki'>"
+							)
+							.replace("__HOME[", "<a href='https://seattleowl.com'>")
+							.replace("]__", "</a>");
+
+					const startNode = data.find(
+						(o) => o.type === "node" && o.node === "start"
+					);
+					if (startNode) {
+						document
+							.querySelector("#desc-page #buttons button#start")
+							.addEventListener("click", () => {
+								canvas.runNode(
+									Array.from(document.querySelectorAll("nm-node")).find(
+										(n) => n.type !== "start"
+									)
+								);
+							});
+					} else {
+						document.querySelector(
+							"#desc-page #buttons button#start"
+						).style.display = "none";
+					}
+
+					document
+						.querySelector("#desc-page #buttons button#edit")
+						.addEventListener("click", () => {
+							document.getElementById("desc-page").style.display = "none";
+							document.getElementById("desc-btn").style.display = "block";
+						});
+				}
 			}, 100);
+		} else if (url.has("t")) {
+			document.querySelector("#desc-page").style.display = "block";
+			document.querySelector("#desc-page h1#title").innerText = url.get("t");
+			document.querySelector("#desc-page span#author").innerText = url.get("a");
+			if (url.get("p"))
+				document.querySelector("#desc-page p#desc").innerHTML = url
+					.get("p")
+					.replace(">", "&#62;")
+					.replace("<", "&#60;")
+					.replace(
+						"__TUTORIAL[",
+						"<a href='https://github.com/seattleowl/node-machine/wiki'>"
+					)
+					.replace(
+						"__TUTORIAL[",
+						"<a href='https://github.com/seattleowl/node-machine/wiki'>"
+					)
+					.replace("]__", "</a>");
+
+			document.querySelector("#desc-page #buttons button#start").style.display =
+				"none";
+
+			document
+				.querySelector("#desc-page #buttons button#edit")
+				.addEventListener("click", () => {
+					document.getElementById("desc-page").style.display = "none";
+					document.getElementById("desc-btn").style.display = "block";
+				});
+		} else if (localStorage.nmWelcome !== "true") {
+			localStorage.nmWelcome = "true";
+			location.href = welcomeURL;
 		}
 
 		// Save
 		document.addEventListener("keydown", (e) => {
-			if (e.key === "s" && e.metaKey) {
+			if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
 				e.preventDefault();
-				location.href = document.querySelector("div[is=nm-canvas]").getURL();
+				location.href = canvas.getURL();
 			}
 		});
 	}

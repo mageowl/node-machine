@@ -3,10 +3,26 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="css/main.css" />
 		<title>NodeMachine</title>
 	</head>
-	<body style="background-color: lightgray">
-		<div is="nm-canvas" style="background-color: white"></div>
+	<body>
+		<div id="desc-page">
+			<h1 id="title" class="desc-input"></h1>
+			<h3>by <span id="author" class="desc-input"></span></h3>
+			<p id="desc" class="desc-input"></p>
+			<div id="buttons">
+				<button id="edit">Edit</button>
+				<button id="start">Start</button>
+			</div>
+		</div>
+		<div is="nm-canvas" id="canvas"></div>
+		<div
+			id="desc-btn"
+			onclick="document.getElementById('desc-page').style.display = 'block';document.querySelectorAll('.desc-input').forEach((n) => n.contentEditable = true)"
+		>
+			Edit Description Page
+		</div>
 		<script src="index.js"></script>
 	</body>
 </html>
