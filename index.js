@@ -648,7 +648,6 @@ const nodeMachine = {
 		constructor() {
 			super();
 			this.style.height = "100%";
-			this.style.fontFamily = "sans-serif";
 			this.menu = null;
 			this.addEventListener("contextmenu", this.ctxMenu);
 			window.addEventListener("resize", () =>
@@ -771,7 +770,7 @@ const nodeMachine = {
 				JSON.stringify(data)
 			)}&t=${document.querySelector("h1#title").innerText}&a=${
 				document.querySelector("span#author").innerText
-			}&p=${document.querySelector("p#desc").innerText}`;
+			}&p=${document.querySelector("p#desc").innerText.replaceAll(" ", "+")}`;
 		}
 	},
 
