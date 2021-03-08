@@ -586,13 +586,17 @@ const nodeMachine = {
 					type: "wire",
 					active: this.active,
 					p1: [
-						this.p1.canvas.renderList.indexOf(this.p1.node),
+						this.p1.canvas.renderList
+							.filter((o) => o.type === "node")
+							.indexOf(this.p1.node),
 						Array.from(
 							this.p1.node.shadowRoot.querySelectorAll("nm-pin")
 						).indexOf(this.p1)
 					],
 					p2: [
-						this.p2.canvas.renderList.indexOf(this.p2.node),
+						this.p2.canvas.renderList
+							.filter((o) => o.type === "node")
+							.indexOf(this.p2.node),
 						Array.from(
 							this.p2.node.shadowRoot.querySelectorAll("nm-pin")
 						).indexOf(this.p2)
