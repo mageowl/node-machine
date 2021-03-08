@@ -579,12 +579,24 @@ const nodeMachine = {
 				const cx = x1 - diff / 2;
 				this.ctx.bezierCurveTo(cx + 30, y1, cx - 30, y2, x2, y2);
 				this.ctx.stroke();
+			}
 
+			if (this.p2) {
 				return {
 					type: "wire",
 					active: this.active,
-					p1: { x: x1, y: y1 },
-					p2: { x: x2, y: y2 }
+					p1: [
+						this.p1.canvas.renderList.indexOf(this.p1.node),
+						Array.from(
+							this.p1.node.shadowRoot.querySelectorAll("nm-pin")
+						).indexOf(this.p1)
+					],
+					p2: [
+						this.p2.canvas.renderList.indexOf(this.p2.node),
+						Array.from(
+							this.p2.node.shadowRoot.querySelectorAll("nm-pin")
+						).indexOf(this.p2)
+					]
 				};
 			}
 		}
@@ -825,6 +837,7 @@ const nodeMachine = {
 
 		if (url.has("d")) {
 			const data = JSON.parse(atob(url.get("d")));
+			const nodes = [];
 
 			data
 				.filter((o) => o.type === "node")
@@ -834,18 +847,20 @@ const nodeMachine = {
 					if (data.value)
 						el.shadowRoot.querySelector("input").value = data.value;
 					canvas.appendChild(el);
+					nodes.push(el);
 				});
 
 			setTimeout(() => {
 				data
 					.filter((o) => o.type === "wire")
 					.forEach((data) => {
-						const p1 = document
-							.elementFromPoint(data.p1.x, data.p1.y)
-							.shadowRoot.elementFromPoint(data.p1.x, data.p1.y);
-						const p2 = document
-							.elementFromPoint(data.p2.x, data.p2.y)
-							.shadowRoot.elementFromPoint(data.p2.x, data.p2.y);
+						console.log(data);
+						const p1 = nodes[data.p1[0]].shadowRoot.querySelectorAll("nm-pin")[
+							data.p1[1]
+						];
+						const p2 = nodes[data.p2[0]].shadowRoot.querySelectorAll("nm-pin")[
+							data.p2[1]
+						];
 						const wire = new this.Wire(canvas, p1, p2);
 
 						if (p2.type === "any")
@@ -879,11 +894,7 @@ const nodeMachine = {
 						document
 							.querySelector("#desc-page #buttons button#start")
 							.addEventListener("click", () => {
-								canvas.runNode(
-									Array.from(document.querySelectorAll("nm-node")).find(
-										(n) => n.type !== "start"
-									)
-								);
+								canvas.runNode(nodes.find((n) => n.type === "start"));
 							});
 					} else {
 						document.querySelector(
