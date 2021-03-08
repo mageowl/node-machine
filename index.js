@@ -587,7 +587,7 @@ const nodeMachine = {
 					active: this.active,
 					p1: [
 						this.p1.canvas.renderList
-							.filter((o) => o.type === "node")
+							.filter((o) => o instanceof nodeMachine.NodeElement)
 							.indexOf(this.p1.node),
 						Array.from(
 							this.p1.node.shadowRoot.querySelectorAll("nm-pin")
@@ -595,7 +595,7 @@ const nodeMachine = {
 					],
 					p2: [
 						this.p2.canvas.renderList
-							.filter((o) => o.type === "node")
+							.filter((o) => o instanceof nodeMachine.NodeElement)
 							.indexOf(this.p2.node),
 						Array.from(
 							this.p2.node.shadowRoot.querySelectorAll("nm-pin")
