@@ -1,5 +1,5 @@
 const welcomeURL =
-	"./?t=NodeMachine&a=seattleowl&p=NodeMachine+is+a+visual+programing+language+in+your+url+bar.+To+start+press+edit+and+right+click+anywhere.+You+can+save+you+files+by+pressing+CTRL%2BS+(CMD%2BS+mac,)+then+copying+the+URL+and+sending+it+to+anybody+you+want.+A+full+tutorial+is+avalible+__TUTORIAL[here]__.";
+	"./?t=NodeMachine&a=seattleowl&p=NodeMachine+is+a+visual+programing+language+in+your+url+bar.+To+start+press+edit+and+right+click+anywhere.+You+can+save+your+files+by+pressing+CTRL%2BS+(CMD%2BS+mac,)+then+copying+the+URL+and+sending+it+to+anybody+you+want.+A+full+tutorial+is+available+__TUTORIAL[here]__.";
 
 const nodes = {
 	add: {
